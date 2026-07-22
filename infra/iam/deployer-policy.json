@@ -1,0 +1,30 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ProvisionDemoInfra",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:*",
+        "eks:*",
+        "ecr:*",
+        "elasticloadbalancing:*",
+        "autoscaling:*",
+        "application-autoscaling:*",
+        "iam:*",
+        "s3:*",
+        "efs:*",
+        "elasticfilesystem:*",
+        "secretsmanager:*",
+        "kms:*",
+        "logs:*",
+        "cloudformation:*",
+        "ssm:*",
+        "acm:*",
+        "codebuild:*",
+        "sts:GetCallerIdentity"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

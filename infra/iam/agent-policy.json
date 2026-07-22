@@ -1,0 +1,29 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Bedrock",
+      "Effect": "Allow",
+      "Action": "bedrock:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "BedrockAgentCore",
+      "Effect": "Allow",
+      "Action": "bedrock-agentcore:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "KnowledgeBaseSourceRead",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:ListBucket"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "Whoami",
+      "Effect": "Allow",
+      "Action": "sts:GetCallerIdentity",
+      "Resource": "*"
+    }
+  ]
+}

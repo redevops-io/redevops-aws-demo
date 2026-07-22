@@ -52,12 +52,12 @@ data "aws_iam_policy_document" "agent" {
   statement {
     sid    = "BedrockAndAgentCore"
     effect = "Allow"
+    # bedrock:* covers models + Knowledge Bases + Agents + Guardrails (all under the `bedrock`
+    # IAM prefix; `bedrock-agent`/`bedrock-agent-runtime` are SDK client names, not IAM prefixes).
     actions = [
-      "bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream",
-      "bedrock:Retrieve", "bedrock:RetrieveAndGenerate",
-      "bedrock:ListFoundationModels", "bedrock:GetFoundationModel",
-      "bedrock-agentcore:*", "bedrock-agent:*", "bedrock-agent-runtime:*",
-      "sts:GetCallerIdentity"
+      "bedrock:*",
+      "bedrock-agentcore:*",
+      "sts:GetCallerIdentity",
     ]
     resources = ["*"]
   }

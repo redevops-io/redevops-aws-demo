@@ -1,0 +1,22 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ObserveOnly",
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:Get*", "cloudwatch:List*", "cloudwatch:Describe*",
+        "logs:Get*", "logs:Describe*", "logs:FilterLogEvents", "logs:StartQuery", "logs:GetQueryResults",
+        "ce:Get*", "ce:List*", "ce:Describe*",
+        "inspector2:List*", "inspector2:Get*", "inspector2:BatchGet*",
+        "config:Describe*", "config:Get*", "config:List*", "config:SelectResourceConfig",
+        "macie2:List*", "macie2:Get*", "macie2:Describe*",
+        "securityhub:Get*", "securityhub:List*", "securityhub:Describe*",
+        "eks:Describe*", "eks:List*",
+        "ecr:Describe*", "ecr:List*", "ecr:BatchGetImage", "ecr:GetDownloadUrlForLayer", "ecr:GetAuthorizationToken",
+        "sts:GetCallerIdentity"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
