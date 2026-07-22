@@ -1,0 +1,33 @@
+# Local dev stack — mirrors the redevops.io/projects one-click guide.
+# Phase 0 brings up the two always-on control-plane services. The infra operator and
+# the security-spine operators are added in Phase 1 (each is a /invoke service the
+# Mission Runtime calls). AWS creds are NEVER put here — Sidekick resolves them from
+# Vault via aws_demo.creds (STS assume-role).
+
+name: redevops-aws-demo
+
+services:
+  # Projects cockpit + Mission Runtime (the governed execution kernel).
+  projects:
+    image: ${PROJECTS_IMAGE:-mission-plane-demo:live-perms}   # built from the agentic-os mission kernel
+    ports:
+      - "8080:8000"        # http://localhost:8080/cockpit
+    environment:
+      VAULT_ADDR: ${VAULT_ADDR:-http://host.docker.internal:8200}
+      DEMO_BUDGET_USD: ${DEMO_BUDGET_USD:-100}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Context Runtime — the decision/optimization layer (planner + retrieval routing).
+  context-runtime:
+    image: ${CONTEXT_RUNTIME_IMAGE:-contextos:latest}
+    environment:
+      VAULT_ADDR: ${VAULT_ADDR:-http://host.docker.internal:8200}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # --- Phase 1 adds (each a POST /invoke operator the Mission Runtime calls) ---
+  # infra_operator:     real terraform/ansible/kubectl driver, pointed at infra/terraform/envs/eks
+  # edge_sentinel:      ECR image scan + hardening proposals
+  # agentic_compliance: CIS/OpenSCAP + Security Hub/Config + Bedrock KB
+  # agentic_privacy:    Macie/Guardrails (active only where a real data source exists)

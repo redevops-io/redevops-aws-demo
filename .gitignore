@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+# terraform
+**/.terraform/
+**/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+**/.build/
+crash.log
+
+# never commit secrets / rendered creds
+*.env
+.env
+*secret*
+!infra/terraform/safety/*.tf
