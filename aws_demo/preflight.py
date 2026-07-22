@@ -135,17 +135,27 @@ def _check_bedrock_invoke(report, session_factory) -> None:
         report.add(Check("bedrock-invoke", "ok", "model invocation works"))
     except Exception as e:
         msg = str(e)
-        if "restricted" in msg.lower() or "Customer Agreement" in msg:
+        low = msg.lower()
+        if "restrict" in low or "customer agreement" in low:
             report.add(Check(
                 "bedrock-invoke", "warn",
-                "account-level restriction (not IAM) — invoke blocked",
-                "Bedrock invoke is held on new/under-review accounts. Open an AWS Support case "
-                "(service: Bedrock) to lift it, and confirm a payment method. IAM + model access are fine. "
-                "The demo runs on your existing model plane meanwhile.",
+                "account-standing hold — NOT a quota or model-access issue",
+                "IAM ✓ and model access ✓; AWS is holding *invoke* on a new/under-review account. "
+                "Fix: confirm a payment method + open an AWS Support case (service: Bedrock, "
+                "'enable model invocation'). It's not quotas (those throttle, not block) and not the "
+                "free-credits application. Demo runs on your existing model plane until it clears.",
             ))
+        elif "throttl" in low or "quota" in low or "rate" in low:
+            report.add(Check(
+                "bedrock-invoke", "warn", "throttled — quota too low",
+                "Request a rate-limit increase in Service Quotas (service: Bedrock) for this model.",
+            ))
+        elif "access" in low or "denied" in low:
+            report.add(Check("bedrock-invoke", "warn", "model access not granted",
+                             "Enable the model in the Bedrock console → Model access (us-east-1)."))
         else:
             report.add(Check("bedrock-invoke", "warn", f"could not verify ({type(e).__name__})",
-                             "Enable model access in the Bedrock console (us-east-1)."))
+                             "Check Bedrock model access + account status in us-east-1."))
 
 
 def render(report: Report) -> str:
