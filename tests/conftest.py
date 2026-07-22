@@ -4,9 +4,11 @@ import sys
 
 import pytest
 
-# The real infra operator lives in the agentic-os repo (apps/infra, package name `infra`).
-# We consume it as a dependency; point AGENTIC_OS_APPS at that repo's apps/ dir if it moves.
-_AGENTIC_OS_APPS = os.environ.get("AGENTIC_OS_APPS", "/mnt/backup/projects/agentic-os/apps")
+# The real infra operator lives in the (separate) agentic-os repo — apps/infra, package `infra`.
+# We consume it as a dependency. Default assumes agentic-os is checked out alongside this repo;
+# override with AGENTIC_OS_APPS if it lives elsewhere. Tests skip cleanly if it isn't present.
+_DEFAULT_APPS = pathlib.Path(__file__).resolve().parents[2] / "agentic-os" / "apps"
+_AGENTIC_OS_APPS = os.environ.get("AGENTIC_OS_APPS", str(_DEFAULT_APPS))
 
 
 @pytest.fixture(scope="session")
