@@ -19,16 +19,21 @@ Mission Runtime ── governs plan · gate · verify · saga · replay
                   EKS + Helm monitoring + edge-sentinel + Agentic Compliance/Privacy
 ```
 
-## Status — Phase 0 (scaffold + safety rails, $0)
+## Status
 
-| Piece | State |
-|---|---|
-| Vault → STS **assume-role** cred helper (`aws_demo/creds.py`) | ✅ built + tested (moto) |
-| In-runtime **budget policy + guard** (`aws_demo/budget.py`, `budget_guard.py`) | ✅ built + tested |
-| **Out-of-band kill-switch** Terraform (roles + Budgets → SNS → Lambda → CodeBuild destroy) | ✅ `terraform validate` clean |
-| `emergency-destroy.sh` / `budget-guard.sh` / `up.sh` / `teardown.sh` | ✅ |
-| Local `compose.yml` (Projects + Context Runtime) | ✅ skeleton (operators land in Phase 1) |
-| Phase 1+ (EKS env, operators, monitor, context arms) | ⬜ next |
+**Phase 0 — scaffold + safety rails ($0)** ✅
+- Vault → STS **assume-role** cred helper (`aws_demo/creds.py`) — tested (moto), no key leaks
+- In-runtime **budget policy + guard** + **out-of-band kill-switch** Terraform (`terraform validate` clean)
+- Attachable **IAM policies** (`infra/iam/`) + safety roles + scripts
+
+**Phase 1 — governed deploy spine (sim-first, $0)** ✅
+- Trimmed **EKS env + Helm monitoring** Terraform — `terraform plan` = **68 real resources, $0**
+- Real **infra operator** wired to `infra/terraform/envs/aws` (`/invoke` service)
+- **Deploy-and-operate mission** runs in-process: scan → plan → **⛔ approval gate** (plan + cost
+  evidence, ~$0.31/hr) → provision → configure → verify; **18 tests green**
+- Run it: `SIM=1 python -m missions.deploy_operate`
+
+**Next:** Phase 2 (edge-sentinel ECR scan → harden → rollout), then the real `apply` for a recorded run.
 
 ## Quickstart (local, no cloud)
 ```bash
