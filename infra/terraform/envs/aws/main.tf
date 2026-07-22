@@ -48,10 +48,12 @@ module "eks" {
   enable_cluster_creator_admin_permissions = true
 
   cluster_addons = {
-    coredns            = {}
-    kube-proxy         = {}
-    vpc-cni            = {}
-    aws-ebs-csi-driver = {}
+    coredns    = {}
+    kube-proxy = {}
+    vpc-cni    = {}
+    # aws-ebs-csi-driver intentionally omitted: nothing in the demo uses persistent volumes
+    # (Prometheus/Grafana/Loki all run on emptyDir). It also needs an IRSA role and commonly
+    # hangs "creating" without one. Re-add with a service_account_role_arn if you need dynamic EBS.
   }
 
   eks_managed_node_groups = {
