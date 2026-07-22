@@ -35,5 +35,5 @@ variable "repo_url" {
 variable "eks_env_path" {
   description = "Path within the repo to the env whose destroy the kill-switch runs."
   type        = string
-  default     = "infra/terraform/envs/eks"
+  default     = "infra/terraform/envs/aws"
 }

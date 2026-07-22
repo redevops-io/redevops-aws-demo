@@ -5,7 +5,7 @@
 # Usage:  AWS_PROFILE=redevops-demo ./scripts/emergency-destroy.sh [--yes]
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-ENV_DIR="${EKS_ENV_PATH:-$HERE/infra/terraform/envs/eks}"
+ENV_DIR="${EKS_ENV_PATH:-$HERE/infra/terraform/envs/aws}"
 
 echo "⚠  Emergency destroy of the demo EKS env at: $ENV_DIR"
 [ "${1:-}" = "--yes" ] || { read -r -p "Type 'destroy' to proceed: " a; [ "$a" = "destroy" ] || { echo "aborted"; exit 1; }; }
