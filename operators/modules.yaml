@@ -1,0 +1,10 @@
+# Deploy-and-operate operators → the URLs Sidekick governs them at (service DNS on the compose net).
+# Mounted into the sidekick container as /app/modules.yaml; SIDEKICK_MODULES points at it. Sidekick
+# discovers each manifest over GET /capabilities and drives the missions over POST /invoke.
+# See deploy/compose.demo.yml (the services) and agentic-os federation.py (the discovery seam).
+operators:
+  infra:              http://infra:8230
+  edge-sentinel:      http://edge-sentinel:8241
+  operate:            http://operate:8242
+  agentic-compliance: http://agentic-compliance:8243
+  agentic-privacy:    http://agentic-privacy:8244

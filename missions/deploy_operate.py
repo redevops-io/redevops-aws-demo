@@ -90,8 +90,29 @@ def build_runtime(sim: bool = True) -> MissionRuntime:
     return MissionRuntime(reg, Executor(client), store=EventStore())
 
 
+def build_http_runtime(operator_urls: dict, transport=None) -> MissionRuntime:
+    """SIM=0 path: the mission drives the operator *services* over HTTP `/invoke`.
+
+    operator_urls maps operator name → base URL (e.g. {"infra": "http://infra:8230",
+    "edge-sentinel": "http://edge-sentinel:8241"}). Manifests are built locally for planning;
+    execution goes over the wire via HTTPOperatorClient. `transport` is injectable for tests.
+    """
+    from agentic_os.mission.operators import HTTPOperatorClient
+    from operators.edge_sentinel.operator import build_edge_sentinel_operator
+
+    infra = build_infra_operator()          # manifest only — real execution happens in the service
+    sentinel = build_edge_sentinel_operator()  # provides image_scanned for the deploy_app scan step
+    reg = CapabilityRegistry()
+    reg.register(infra.manifest)
+    reg.register(sentinel.manifest)
+    client = HTTPOperatorClient(operator_urls, transport=transport)
+    return MissionRuntime(reg, Executor(client), store=EventStore())
+
+
 def create_deploy_mission(rt: MissionRuntime, goal: str = "Deploy the redevops-aws-demo repo to AWS"):
-    grants = ["infra:read", "infra:write", "scan:read"]
+    # scan:read → placeholder scanner (local build_runtime); ecr:read → edge-sentinel (HTTP/SIM=0 path).
+    # Both provide `image_scanned`; granting both lets one mission definition drive either scanner.
+    grants = ["infra:read", "infra:write", "scan:read", "ecr:read"]
     m = rt.create_mission(goal, policy_refs=grants, template="deploy_app")
     rt.run(m.id)
     return m

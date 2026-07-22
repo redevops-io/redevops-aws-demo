@@ -73,6 +73,36 @@ uv venv .venv && uv pip install --python .venv -e ".[dev]"
 ./scripts/up.sh                       # Projects → http://localhost:8080/cockpit
 ```
 
+## Run the demo — Sidekick governing the five operators
+
+The deploy-and-operate operators run as their own `/invoke` services (one image,
+`operators/service.py`, `OPERATOR` selects which). Sidekick **federates** them from
+`operators/modules.yaml` — it discovers each manifest over `GET /capabilities` and drives the
+missions over `POST /invoke`, without importing the operator code (see
+`agentic-os/deploy/sidekick-devops/federation.py`).
+
+```bash
+# $0 dry run — every operator short-circuits to its in-process simulator:
+SIM=1 docker compose -f deploy/compose.demo.yml up --build
+
+# Real mode (SIM=0, default): operators shell out to terraform/aws/kubectl.
+# Sidekick injects Vault→STS short-lived creds before the provision gate.
+docker compose -f deploy/compose.demo.yml up --build
+```
+Then open the Projects cockpit at http://localhost:8000/cockpit and start the deploy mission — it
+plans + scans, pauses at the provision approval gate with the terraform plan + cost estimate, then
+provisions → configures → verifies across the federated operators. `AGENTIC_OS_ROOT` defaults to a
+sibling `agentic-os` checkout.
+
+| service | port | operator |
+|---|---|---|
+| infra | 8230 | terraform/ansible provision · configure · verify · drift |
+| edge-sentinel | 8241 | ECR/Inspector scan → harden → rollout → rescan |
+| operate | 8242 | incident: gather → diagnose → remediate → verify |
+| agentic-compliance | 8243 | CIS/OpenSCAP posture scan → gated remediation |
+| agentic-privacy | 8244 | PII/data-map scan (active only where a data source exists) |
+| sidekick | 8000 | Projects cockpit + Mission Runtime governing the above |
+
 ## Cloud prerequisites (owner-provisioned — see `infra/terraform/safety/README.md`)
 1. Dedicated **us-east-1** account with **Bedrock model access + AgentCore** enabled.
 2. `terraform apply` the **safety** module → three roles + Budgets kill-switch.
