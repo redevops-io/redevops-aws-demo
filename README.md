@@ -43,7 +43,15 @@ Mission Runtime ── governs plan · gate · verify · saga · replay
 - **Only Docker is required locally** — terraform/aws/ansible/helm/kubectl all run in the operator
   container (macOS/Windows/Linux install matrix in the skill + [docs/getting-started.md](docs/getting-started.md)).
 
-**Next:** Phase 2 (edge-sentinel ECR scan → harden → rollout), then the real `apply` for a recorded run.
+**Phase 2 — edge-sentinel supply-chain hardening (sim-first, $0)** ✅
+- `operators/edge_sentinel/` — `sentinel.scan` (ECR image findings; also provides `image_scanned`) ·
+  `sentinel.harden` (gated rebuild `--pull` + push) · `sentinel.rollout` (`kubectl rollout restart`) ·
+  `sentinel.rescan` (confirm cleared)
+- **Governed harden loop** (`missions/harden_images.py`): scan finds a seeded CVE → **⛔ "harden?" gate**
+  → approve → rebuild+push → rollout → re-scan **cleared** (reject hardens nothing). **26 tests green.**
+- Run it: `APPROVE=1 python -m missions.harden_images`
+
+**Next:** Phase 3 (compliance + privacy + induced-fault operate loop), then the real `apply` for a recorded run.
 
 ## Quickstart (local, no cloud)
 ```bash
