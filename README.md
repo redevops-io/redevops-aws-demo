@@ -51,7 +51,16 @@ Mission Runtime ── governs plan · gate · verify · saga · replay
   → approve → rebuild+push → rollout → re-scan **cleared** (reject hardens nothing). **26 tests green.**
 - Run it: `APPROVE=1 python -m missions.harden_images`
 
-**Next:** Phase 3 (compliance + privacy + induced-fault operate loop), then the real `apply` for a recorded run.
+**Phase 3 — operate loop + security posture (sim-first, $0)** ✅
+- **Induced-fault operate loop** (`missions/incident_response.py`, the "wow"): rising restarts →
+  gather evidence → diagnose (*memory limit too low*) → **⛔ remediation gate** → raise memory →
+  **verify healthy**. Models CloudWatch/Prometheus alarm → incident mission (no silent mutation).
+- **Agentic Compliance + Privacy** (`missions/posture.py`): CIS scan of a seeded vulnerable workload;
+  PII scan of a synthetic dataset (**inactive with no data source — never fakes findings**). The
+  kernel marks the whole compliance/privacy domain **regulatory → even the scan is gated**.
+- Run: `APPROVE=1 python -m missions.incident_response`. **34 tests green.**
+
+**Next:** Phase 4 (Bedrock/AgentCore/Strands + outreach capstone), then the real `apply` for a recorded run.
 
 ## Quickstart (local, no cloud)
 ```bash
