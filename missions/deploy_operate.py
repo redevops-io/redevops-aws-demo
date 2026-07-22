@@ -97,9 +97,38 @@ def create_deploy_mission(rt: MissionRuntime, goal: str = "Deploy the redevops-a
     return m
 
 
+def preflight_gate(session_factory=None, check_cloud: bool = True):
+    """Node-0 of the deploy mission (Sidekick's `deployment-preflight` skill).
+
+    Returns (ready: bool, Report). A real deploy must not compile `terraform plan` until ready;
+    sim runs pass check_cloud=False to skip the cloud probes.
+    """
+    from aws_demo.preflight import Report, check_aws, check_local
+
+    report = Report()
+    check_local(report)
+    if check_cloud:
+        try:
+            from aws_demo.doctor import session_factory as default_sf
+            check_aws(report, session_factory or default_sf())
+        except Exception:  # noqa: BLE001
+            pass
+    return report.ready, report
+
+
 def main() -> None:  # pragma: no cover — manual/demo driver
     import json
+    from aws_demo.preflight import render
+
     sim = os.environ.get("SIM", "1") != "0"
+
+    # node 0: preflight gate — refuse to deploy into an unready environment
+    ready, report = preflight_gate(check_cloud=not sim)
+    print(render(report))
+    if not sim and not ready:
+        print("\n⛔ preflight BLOCKED — not creating the deploy mission. Fix the items above.")
+        return
+
     rt = build_runtime(sim=sim)
     m = create_deploy_mission(rt)
     print(f"mission {m.id}  state={m.state.value}  (sim={sim})")

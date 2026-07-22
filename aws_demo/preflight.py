@@ -1,4 +1,11 @@
-"""Sidekick preflight / doctor — flags exactly what a user must set up before the demo can run.
+"""Executable binding of Sidekick's cloud-agnostic **deployment-preflight** skill (AWS impl).
+
+This is not a one-off script — it's the deterministic checker the `deployment-preflight` skill runs
+as the opening gate of every deploy mission (the skill is the procedure; this is the execution, and
+it's exposable as an MCP `preflight_check("aws")` tool). Other clouds implement the same
+`{ready, checks[], blockers[]}` contract with their own CLI/probes; only those differ.
+
+Flags exactly what a user must set up before the demo can run.
 
 Two classes of blocker:
   1. LOCAL — only **Docker** is truly required; terraform/aws/ansible/helm/kubectl run *inside*

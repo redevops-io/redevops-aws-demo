@@ -47,11 +47,14 @@ model access are separate; the demo works without either (it uses your existing 
   ```
 
 ## Step 5 — Preflight, then bring it up
+Sidekick runs its cloud-agnostic **`deployment-preflight`** skill automatically as node 0 of every
+deploy mission (shared across AWS/GCP/Azure/DigitalOcean — only the CLI + Terraform syntax differ),
+and won't compile a `terraform plan` until it's green. You can also run it by hand:
 ```bash
-./scripts/doctor.sh     # ✓/✗ per requirement, with the exact fix for each red item
+./scripts/doctor.sh     # the skill's executable binding: ✓/✗ per requirement + the exact fix
 ./scripts/up.sh         # Projects cockpit → http://localhost:8080/cockpit
 ```
-When the doctor says **READY**, you're good. Hard blockers are only: **Docker**, **working AWS
+When it says **READY**, you're good. Hard blockers are only: **Docker**, **working AWS
 credentials**, and **deployer permissions**. Cost Explorer and Bedrock show as *warnings* — nice to
 have, not required to deploy.
 

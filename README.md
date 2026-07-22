@@ -34,11 +34,14 @@ Mission Runtime ── governs plan · gate · verify · saga · replay
 - Run it: `SIM=1 python -m missions.deploy_operate`
 
 **Onboarding — Sidekick tells you what's required** ✅
-- `./scripts/doctor.sh` preflights everything and prints a ✓/✗ checklist with the **exact fix** per
-  item (creds, region, per-role permissions, and the **Bedrock account-invoke restriction** it detects
-  and explains). Hard blockers are only Docker + working creds + deployer perms; cost/Bedrock are warnings.
-- **Only Docker is required locally** — terraform/aws/ansible/helm/kubectl all run in the operator container.
-- Full walkthrough (open account → user → policies → creds → deploy): **[docs/getting-started.md](docs/getting-started.md)**.
+- Preflight is a **cloud-agnostic Sidekick skill** (`deployment-preflight`) that gates every deploy
+  mission (node 0), shared across AWS/GCP/Azure/DigitalOcean — only the CLI + Terraform syntax differ.
+  `aws_demo/preflight.py` is its executable AWS binding (exposable as an MCP `preflight_check` tool);
+  run it by hand with `./scripts/doctor.sh` for a ✓/✗ checklist + the **exact fix** per item.
+- It detects creds, region, per-role permissions, and the **Bedrock account-invoke restriction** (with
+  the support-case fix). Hard blockers are only Docker + creds + deployer perms; cost/Bedrock are warnings.
+- **Only Docker is required locally** — terraform/aws/ansible/helm/kubectl all run in the operator
+  container (macOS/Windows/Linux install matrix in the skill + [docs/getting-started.md](docs/getting-started.md)).
 
 **Next:** Phase 2 (edge-sentinel ECR scan → harden → rollout), then the real `apply` for a recorded run.
 
