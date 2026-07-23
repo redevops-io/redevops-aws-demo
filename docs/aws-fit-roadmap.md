@@ -6,16 +6,21 @@ This started as "what do we build for AWS." The file-level audit that follows �
 (Context Runtime), `agentic-os` (Mission Runtime + Sidekick) and `redevops-aws-demo` (the AWS glue) —
 turned up a more important conclusion than the AWS roadmap itself.
 
-> **Implementation status (context-runtime PR #15, `feat/provider-adapters-aws`).** Phase 0 and
-> roadmap items 1–7 + the governance seam are now **built and tested (75 new tests, no boto3
-> required)** as a provider-neutral layer — AWS is the first concrete `CloudProvider`; Azure/GCP/DO
-> are a new subpackage + `register_provider`, no kernel change. Delivered: fail-loud SQL guard ·
-> Bedrock model tier · OpenSearch + Bedrock KB retrievers · Athena/DuckDB text-to-SQL · reasoning
-> strategies · learning-on-default-path · pgvector · Bedrock Guardrails + CloudWatch + GuardedModel ·
-> one-call `build_runtime(provider, …)` wiring. **Remaining (next tranche):** the control-plane
-> serving surface (§2.4 auth + MCP tool, §2.5 `/v1`-over-Bedrock), Sidekick post-deploy wiring (§2.6,
-> the `CloudWatchReader` exists), AgentCore Identity (§2.7, deferred to the AgentCore account), and
-> Part 3 scale-hardening (durable EventStore, serving auth, saga-undo verification, sandbox).
+> **Implementation status — 3 PRs, ~87 new tests, no boto3 required.** Built as a provider-neutral
+> layer: AWS is the first concrete `CloudProvider`; Azure/GCP/DO are a new subpackage +
+> `register_provider`, no kernel change.
+> - **context-runtime #15** (`feat/provider-adapters-aws`) — Phase 0 + items 1–7 + governance:
+>   fail-loud SQL guard · Bedrock model tier · OpenSearch + Bedrock KB retrievers · Athena/DuckDB
+>   text-to-SQL · reasoning strategies · learning-on-default-path · pgvector · Bedrock Guardrails +
+>   CloudWatch + GuardedModel · one-call `build_runtime(provider, …)`. **(75 tests)**
+> - **context-runtime #16** (`feat/serving-surface-aws`, stacked) — §2.4–2.5: Bedrock `/v1` upstream ·
+>   API-key auth on the read routes · MCP retrieval tool for AgentCore Gateway / Strands. **(7 tests)**
+> - **agentic-os #4** (`feat/sidekick-cloudwatch`) — §2.6: Sidekick reads CloudWatch post-deploy;
+>   each alarm becomes a governed response mission (alarm → mission → approve/rollback). **(5 tests)**
+>
+> **Remaining:** §2.7 AgentCore Identity (deferred to an AgentCore-enabled account; `identity_broker()`
+> returns `None` today) and Part 3 scale-hardening (durable EventStore, saga-undo verification,
+> sandbox) — infra work that wants live AWS. Read-route auth (§3.2) shipped in #16.
 
 ## The headline
 
